@@ -48,13 +48,13 @@ with tab1:
                                            format_func = lambda x: f"{x['name']}")
             if selected_item:
                 with st.expander("Order Details", expanded = True):
-                    st.markdown(f"### Item: {selected_item["name"]}")
-                    st.markdown(f"Unit Price: ${selected_item["price"]}")
+                    st.markdown(f"### Item: {selected_item['name']}")
+                    st.markdown(f"Unit Price: ${selected_item['price']}")
                     quantity_ordered = int(st.number_input("Enter the order quantity", 
                                                            min_value = 0, 
-                                                           key = f"quantity_ordered_{selected_item["id"]}"))
+                                                           key = f"quantity_ordered_{selected_item['id']}"))
                 
-                    total_price = quantity_ordered * selected_item["price"]
+                    total_price = quantity_ordered * selected_item['price']
 
                     st.markdown(f"Total Price: ${total_price:.2f}")
         
@@ -62,17 +62,17 @@ with tab1:
         
         if btn_order:
             if (not customer_name) or (quantity_ordered == 0):
-                st.warning("Missing required information")
+                st.error("Missing required information")
                 st.stop()
 
             else:
                 found_item = None 
                 for item in inventory:
-                    if item["id"] == selected_item["id"]:
+                    if item['id'] == selected_item['id']:
                         found_item = item
                         break
                 
-                if found_item["stock"] < quantity_ordered:
+                if found_item['stock'] < quantity_ordered:
                     st.warning(f"Not enough stock. Available: {found_item['stock']}")
                     st.stop()
 
@@ -80,15 +80,13 @@ with tab1:
                     with st.spinner("Order is being placed..."):
             
                     # Reduce stock
-                        found_item["stock"] -= quantity_ordered
+                        found_item['stock'] -= quantity_ordered
+                        with json_file1.open("w", encoding="utf-8") as f:
+                            json.dump(inventory, f, indent=4)
+                        
                         new_order_id = "Order_" + str(next_order_id_number)
                         next_order_id_number += 1
-
-                    inventory.append(
-                        {
-                        "stock" : found_item["stock"]
-                        }
-                    )
+                    
                     order_status = "Placed"
 
                     orders.append(
