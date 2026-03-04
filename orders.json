@@ -1,0 +1,8 @@
+[
+    {"order_id" : "Order_101", "item_id" : 2, 
+     "quantity" : 2, "status" : "Placed", "total" : 8.50
+    },
+    {"order_id" : "Order_102", "item_id" : 3, 
+     "quantity" : 1, "status" : "Placed", "total" : 3.75
+    }
+]
