@@ -1,5 +1,5 @@
 import streamlit as st
-
+import time
 import json
 from pathlib import Path
 
@@ -8,7 +8,7 @@ json_file1 = Path("inventory.json")
 json_file2 = Path("orders.json")
 
 
-next_order_id_number = 3
+next_order_id_number = 0
 
 # For saving after changing information
 #with open(json_file, "w") as f:
@@ -35,69 +35,88 @@ with tab1:
     st.subheader("Place Order")
     with st.container(border = True):
 
-        col1, col2 = st.columns([2,1])
+        col1, col2 = st.columns([5,4])
         # col1, col2 = st.columns(2) this will give you 50/50 
         # col1, col2, col3 = st.columns([1,6,1]) # changes spacing 
 
     with col1:
         with st.container(border = True):
             st.markdown("##### Order Details")
-            place_order = []
+            customer_name = st.text_input("Enter item name:", placeholder = "Ex: John Doe")
 
-            selected_item = st.selectbox("Select Item", options = inventory,
+            selected_item = st.selectbox("Select Item:", options = inventory,
                                            format_func = lambda x: f"{x['name']}")
             if selected_item:
                 with st.expander("Order Details", expanded = True):
                     st.markdown(f"### Item: {selected_item["name"]}")
-                    st.markdown(f"Unit Price: {selected_item["price"]}")
-                    quantity_orederd = int(st.number_input("Enter the order quantity", 
+                    st.markdown(f"Unit Price: ${selected_item["price"]}")
+                    quantity_ordered = int(st.number_input("Enter the order quantity", 
                                                            min_value = 0, 
                                                            key = f"quantity_ordered_{selected_item["id"]}"))
                 
-                    total_price = quantity_orederd * selected_item["price"]
+                    total_price = quantity_ordered * selected_item["price"]
 
-                    st.markdown(f"Total Price: {total_price}")
+                    st.markdown(f"Total Price: ${total_price:.2f}")
         
+                    btn_order = st.button("Place Order", use_container_width = True, type = "primary", disabled = False) # width = "content"(len of content), width = "stretch" 
+        
+        if btn_order:
+            if (not customer_name) or (quantity_ordered == 0):
+                st.warning("Missing required information")
+                st.stop()
 
+            else:
+                found_item = None 
+                for item in inventory:
+                    if item["id"] == selected_item["id"]:
+                        found_item = item
+                        break
+                
+                if found_item["stock"] < quantity_ordered:
+                    st.warning(f"Not enough stock. Available: {found_item['stock']}")
+                    st.stop()
+
+                else:
+                    with st.spinner("Order is being placed..."):
             
-            
-    
-            #enter_quantity =
-             
-            #show_total_price =  
+                    # Reduce stock
+                        found_item["stock"] -= quantity_ordered
+                        new_order_id = "Order_" + str(next_order_id_number)
+                        next_order_id_number += 1
 
-            #edit_name = st.text_input("Item Name", key = f"edit_name_{place_order_edit["id"]}", value = place_order_edit["name"])
+                    inventory.append(
+                        {
+                        "stock" : found_item["stock"]
+                        }
+                    )
+                    order_status = "Placed"
 
-        
-        # btn_save = st.button("Save", use_container_width = True, disabled = False) # width = "content"(len of content), width = "stretch" 
-        
-        # if btn_save:
-        #     if not title:
-        #         st.warning("Title needs to be provided!")
-        #     else:
-        #         with st.spinner("Assignment is being recorded..."):
-        #             time.sleep(5)
+                    orders.append(
+                        {
+                            "order_id" : new_order_id,
+                            "customer" : customer_name,
+                            "item" : selected_item,
+                            "quantity" : quantity_ordered,
+                            "total" : total_price,
+                            "Status" : order_status
 
-        #             new_assignment_id = "HW" + str(next_order_id_number)
-        #             next_order_id_number += 1
+                        }
+                    )
 
-        #             assignments.append(
-        #                 {
-        #                     "id" : new_assignment_id,
-        #                     "title" : title,
-        #                     "description" : description,
-        #                     "points" : points,
-        #                     "type" : assignment_type
-
-        #                 }
-        #             )
-
-        #             # record into json file 
-        #             with json_path.open("w", encoding = "utf-8") as f:
-        #                 json.dump(assignments, f)
+                    # record into json file 
+                    with json_file2.open("w", encoding = "utf-8") as f:
+                        json.dump(orders, f)
 
 
 
-        #             st.success("New Assignment is recorded!")
-        #             st.info("This is a new assignment")
-        #             st.dataframe(assignments)
+                    st.success("Order was placed")
+                    with col2: 
+                        with st.container(border = True):
+                            st.markdown("##### Reciept")
+                            st.markdown(f"**Order_ID:** {new_order_id}")
+                            st.markdown(f"**Customer Name:** {customer_name}")
+                            st.markdown(f"**Item Name:** {selected_item['name']}")
+                            st.markdown(f"**Quantity Ordered:** {quantity_ordered}")
+                            st.markdown(f"**Total:** ${total_price:.2f}")
+                            st.markdown(f"**Status:** {order_status}")
+                    

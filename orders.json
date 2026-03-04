@@ -1,8 +1,1 @@
-[
-    {"order_id" : "Order_101", "item_id" : 2, 
-     "quantity" : 2, "status" : "Placed", "total" : 8.50
-    },
-    {"order_id" : "Order_102", "item_id" : 3, 
-     "quantity" : 1, "status" : "Placed", "total" : 3.75
-    }
-]
+[{"order_id": "Order_0", "customer": "Ty", "item": {"id": 5, "name": "Blueberry Muffin", "price": 2.95, "stock": 18}, "quantity": 17, "total": 50.150000000000006, "Status": "Placed"}, {"order_id": "Order_0", "customer": "Ty", "item": {"id": 5, "name": "Blueberry Muffin", "price": 2.95, "stock": 1}, "quantity": 17, "total": 50.150000000000006, "Status": "Placed"}, {"order_id": "Order_0", "customer": "Ty", "item": {"id": 5, "name": "Blueberry Muffin", "price": 2.95, "stock": 1}, "quantity": 17, "total": 50.150000000000006, "Status": "Placed"}, {"order_id": "Order_0", "customer": "Ty", "item": {"id": 5, "name": "Blueberry Muffin", "price": 2.95, "stock": 1}, "quantity": 17, "total": 50.150000000000006, "Status": "Placed"}, {"order_id": "Order_0", "customer": "Ty", "item": {"id": 5, "name": "Blueberry Muffin", "price": 2.95, "stock": 1}, "quantity": 17, "total": 50.150000000000006, "Status": "Placed"}]
