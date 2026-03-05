@@ -123,29 +123,34 @@ with tab2:
     
     tab_option = st.radio("View/Search", ["View", "Search"], horizontal = True)
     
-    if tab_option == "View":
-        st.dataframe(inventory)
+    st.divider()
 
-        total_stock = 0
-        low_stock = 10
+    with st.container(border = True):
+        if tab_option == "View":
+            st.markdown("## **Inventory View**")
+            st.dataframe(inventory)
 
-        for item in inventory:
-            total_stock += item["stock"]
-            if item["stock"] < low_stock:
-                st.warning(f"LOW STOCK: {item['name']} has {item['stock']} left in stock.")
+            total_stock = 0
+            low_stock = 10
 
-        with st.container(border = True):
-            st.markdown(f"### **Total Stock:** {total_stock}")        
-        
+            for item in inventory:
+                total_stock += item["stock"]
+                if item["stock"] < low_stock:
+                    st.warning(f"LOW STOCK: {item['name']} has {item['stock']} left in stock.")
 
-    else:
-        with st.container(border = True):
-            selected_item = st.selectbox("Select Item:", options = inventory,
-                                        format_func = lambda x: f"{x['name']}",
-                                        key = f"view_item{selected_item['id']}")
-            if selected_item:
-                with st.expander("Inventory", expanded = True):
-                    st.markdown(f"Item ID: {selected_item['id']}")
-                    st.markdown(f"Item Name: {selected_item['name']}")
-                    st.markdown(f"Stock Count: {selected_item['stock']}")
+            with st.container(border = True):
+                st.markdown(f"### **Total Stock:** {total_stock}")        
+            
 
+        else:
+            with st.container(border = True):
+                selected_item = st.selectbox("Select Item:", options = inventory,
+                                            format_func = lambda x: f"{x['name']}",
+                                            key = f"view_item{selected_item['id']}")
+                if selected_item:
+                    with st.expander("Inventory", expanded = True):
+                        st.markdown(f"Item ID: {selected_item['id']}")
+                        st.markdown(f"Item Name: {selected_item['name']}")
+                        st.markdown(f"Stock Count: {selected_item['stock']}")
+
+#with tab3:
