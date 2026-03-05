@@ -34,7 +34,6 @@ if json_file2.exists():
 
 # got lines 35 from 44 from chatgpt becuase I tried the method we 
 # we used in class but it would't update
-# 
 
 max_order_num = 0
 for o in orders:
@@ -166,10 +165,10 @@ with tab2:
                                             format_func = lambda x: f"{x['name']}",
                                             key = f"view_item{selected_item['id']}")
                 if selected_item:
-                    with st.expander("Inventory", expanded = True):
-                        st.markdown(f"Item ID: {selected_item['id']}")
-                        st.markdown(f"Item Name: {selected_item['name']}")
-                        st.markdown(f"Stock Count: {selected_item['stock']}")
+                    with st.expander("**Inventory**", expanded = True):
+                        st.markdown(f"**Item ID:** {selected_item['id']}")
+                        st.markdown(f"**Item Name:** {selected_item['name']}")
+                        st.markdown(f"**Stock Count:** {selected_item['stock']}")
 
 with tab3:
     with st.container(border = True):
@@ -179,7 +178,7 @@ with tab3:
                                         format_func = lambda x: f"{x['name']}",
                                         key = f"restock_item{selected_item['id']}")
                 
-            restock_ordered = int(st.number_input("Enter the order quantity", 
+            restock_ordered = int(st.number_input("Enter the restock quantity", 
                                                     min_value = 0, 
                                                     key = f"restock_ordered_{selected_item['id']}"))
             
@@ -211,21 +210,31 @@ with tab4:
     st.divider()
     with st.container(border = True):
         if tab_option == "View":
-            st.markdown("## **Inventory View**")
-            st.dataframe(orders)
+            st.markdown("## **Order View**")
+            if not orders:
+                st.info("No orders have been placed yet.")
+                st.stop()
+            else:
+                st.dataframe(orders)
         else:
             with st.container(border = True):
                 st.markdown("### Cancel Order")
+                if not orders:
+                    st.info("No orders have been placed yet.")
+                    st.stop()
                 selected_item = st.selectbox("Select order to cancel:", options = orders,
                                         format_func = lambda x: f"{x['order_id']}",
                                         key = f"manage_item_{selected_item['id']}")
-            
-            with st.expander("Order Details", expanded = True):
-                st.markdown(f"### Customer: {selected_item['customer']}")
-                st.markdown(f"**Item:** {selected_item['item']}")
-                st.markdown(f"**Quantity:** {selected_item['quantity']}")
-                st.markdown(f"**Total:** ${selected_item['total']:.2f}")
-                st.markdown(f"**Status:** {selected_item['status']}")
+            if not orders:
+                    st.info("No orders have been placed yet.")
+                    st.stop()
+            else:
+                with st.expander("Order Details", expanded = True):
+                    st.markdown(f"### Customer: {selected_item['customer']}")
+                    st.markdown(f"**Item:** {selected_item['item']}")
+                    st.markdown(f"**Quantity:** {selected_item['quantity']}")
+                    st.markdown(f"**Total:** ${selected_item['total']:.2f}")
+                    st.markdown(f"**Status:** {selected_item['status']}")
                 
             btn_cancel = st.button("Cancel Order", use_container_width = True, type = "primary", disabled = False)
 
