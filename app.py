@@ -144,6 +144,7 @@ with tab2:
 
         else:
             with st.container(border = True):
+                st.markdown("## Inventory Search")
                 selected_item = st.selectbox("Select Item:", options = inventory,
                                             format_func = lambda x: f"{x['name']}",
                                             key = f"view_item{selected_item['id']}")
