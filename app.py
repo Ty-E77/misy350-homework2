@@ -153,4 +153,34 @@ with tab2:
                         st.markdown(f"Item Name: {selected_item['name']}")
                         st.markdown(f"Stock Count: {selected_item['stock']}")
 
-#with tab3:
+with tab3:
+    with st.container(border = True):
+        st.markdown("## Restock Inventory")
+        with st.container(border = True):
+            selected_item = st.selectbox("Select Item:", options = inventory,
+                                        format_func = lambda x: f"{x['name']}",
+                                        key = f"restock_item{selected_item['id']}")
+                
+            restock_ordered = int(st.number_input("Enter the order quantity", 
+                                                    min_value = 0, 
+                                                    key = f"restock_ordered_{selected_item['id']}"))
+            
+            btn_restock = st.button("Restock", use_container_width = True, type = "primary", disabled = False) # width = "content"(len of content), width = "stretch" 
+            
+            if btn_restock:
+                if restock_ordered == 0:
+                    st.error("Missing required information")
+                    st.stop()
+                else:
+                    found_item = None 
+                    for item in inventory:
+                        if item['id'] == selected_item['id']:
+                            found_item = item
+                            break
+                    with st.spinner("Restock is being placed..."):
+                        time.sleep(5)
+
+                        found_item['stock'] += restock_ordered
+                        with json_file1.open("w", encoding="utf-8") as f:
+                            json.dump(inventory, f, indent=4)
+                        st.success("Restock Placed")
