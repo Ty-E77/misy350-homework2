@@ -78,6 +78,7 @@ with tab1:
 
                 else:
                     with st.spinner("Order is being placed..."):
+                        time.sleep(5)
             
                     # Reduce stock
                         found_item['stock'] -= quantity_ordered
@@ -93,9 +94,9 @@ with tab1:
                         {
                             "order_id" : new_order_id,
                             "customer" : customer_name,
-                            "item" : selected_item,
+                            "item" : selected_item["name"],
                             "quantity" : quantity_ordered,
-                            "total" : total_price,
+                            "total" : round(total_price, 2),
                             "Status" : order_status
 
                         }
@@ -103,7 +104,7 @@ with tab1:
 
                     # record into json file 
                     with json_file2.open("w", encoding = "utf-8") as f:
-                        json.dump(orders, f)
+                        json.dump(orders, f, indent = 6)
 
 
 
@@ -118,3 +119,33 @@ with tab1:
                             st.markdown(f"**Total:** ${total_price:.2f}")
                             st.markdown(f"**Status:** {order_status}")
                     
+with tab2:
+    
+    tab_option = st.radio("View/Search", ["View", "Search"], horizontal = True)
+    
+    if tab_option == "View":
+        st.dataframe(inventory)
+
+        total_stock = 0
+        low_stock = 10
+
+        for item in inventory:
+            total_stock += item["stock"]
+            if item["stock"] < low_stock:
+                st.warning(f"LOW STOCK: {item['name']} has {item['stock']} left in stock.")
+
+        with st.container(border = True):
+            st.markdown(f"### **Total Stock:** {total_stock}")        
+        
+
+    else:
+        with st.container(border = True):
+            selected_item = st.selectbox("Select Item:", options = inventory,
+                                        format_func = lambda x: f"{x['name']}",
+                                        key = f"view_item{selected_item['id']}")
+            if selected_item:
+                with st.expander("Inventory", expanded = True):
+                    st.markdown(f"Item ID: {selected_item['id']}")
+                    st.markdown(f"Item Name: {selected_item['name']}")
+                    st.markdown(f"Stock Count: {selected_item['stock']}")
+
