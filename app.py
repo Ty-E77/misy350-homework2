@@ -185,3 +185,19 @@ with tab3:
                         with json_file1.open("w", encoding="utf-8") as f:
                             json.dump(inventory, f, indent=4)
                         st.success("Restock Placed")
+
+with tab4:
+    st.markdown("## Mange Orders")
+
+    tab_option = st.radio("View/Delete or Cancel", ["View", "Delete or Cancel"], horizontal = True)
+    
+    st.divider()
+    with st.container(border = True):
+        if tab_option == "View":
+            st.markdown("## **Inventory View**")
+            st.dataframe(orders)
+        else:
+            with st.container(border = True):
+                selected_item = st.selectbox("Select Item:", options = orders,
+                                        format_func = lambda x: f"{x['order_id']}",
+                                        key = f"manage_item_{selected_item['id']}")
