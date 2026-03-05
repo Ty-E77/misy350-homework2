@@ -31,6 +31,22 @@ if json_file1.exists():
 if json_file2.exists():
     with open(json_file2, "r") as f:
         orders = json.load(f)
+
+# got lines 35 from 44 from chatgpt becuase I tried the method we 
+# we used in class but it would't update
+# 
+
+max_order_num = 0
+for o in orders:
+    oid = str(o.get("order_id", ""))
+    if oid.startswith("Order_"):
+        try:
+            max_order_num = max(max_order_num, int(oid.split("_")[1]))
+        except ValueError:
+            pass
+
+next_order_id_number = max_order_num 
+
 with tab1:
     st.subheader("Place Order")
     with st.container(border = True):
@@ -85,8 +101,9 @@ with tab1:
                         with json_file1.open("w", encoding="utf-8") as f:
                             json.dump(inventory, f, indent=4)
                         
+                        next_order_id_number = next_order_id_number + 1
                         new_order_id = "Order_" + str(next_order_id_number)
-                        next_order_id_number += 1
+                        
                     
                     order_status = "Placed"
 
@@ -97,7 +114,7 @@ with tab1:
                             "item" : selected_item["name"],
                             "quantity" : quantity_ordered,
                             "total" : round(total_price, 2),
-                            "Status" : order_status
+                            "status" : order_status
 
                         }
                     )
@@ -198,6 +215,43 @@ with tab4:
             st.dataframe(orders)
         else:
             with st.container(border = True):
-                selected_item = st.selectbox("Select Item:", options = orders,
+                st.markdown("### Cancel Order")
+                selected_item = st.selectbox("Select order to cancel:", options = orders,
                                         format_func = lambda x: f"{x['order_id']}",
                                         key = f"manage_item_{selected_item['id']}")
+            
+            with st.expander("Order Details", expanded = True):
+                st.markdown(f"### Customer: {selected_item['customer']}")
+                st.markdown(f"**Item:** {selected_item['item']}")
+                st.markdown(f"**Quantity:** {selected_item['quantity']}")
+                st.markdown(f"**Total:** ${selected_item['total']:.2f}")
+                st.markdown(f"**Status:** {selected_item['status']}")
+                
+            btn_cancel = st.button("Cancel Order", use_container_width = True, type = "primary", disabled = False)
+
+            if btn_cancel:
+
+                found_item = None 
+                for item in inventory:
+                    if item['name'] == selected_item['item']:
+                        found_item = item
+                        break
+
+            
+                found_item['stock'] = selected_item['quantity'] + found_item['stock']
+                with json_file1.open("w", encoding="utf-8") as f:
+                    json.dump(inventory, f, indent=4)
+                        
+                cancel_order = selected_item['order_id']
+                orders = [order for order in orders if order['order_id'] != selected_item['order_id']]
+                    
+                with st.spinner("Order is being cancelled..."):
+                    time.sleep(5)
+  
+                    # record into json file 
+                with json_file2.open("w", encoding = "utf-8") as f:
+                    json.dump(orders, f, indent = 6)
+
+
+
+                st.success("Order Cancelled and Stock Refunded")    
