@@ -46,20 +46,26 @@ for o in orders:
 
 next_order_id_number = max_order_num 
 
+if "show_receipt" not in st.session_state:
+    st.session_state.show_receipt = False
+
+if "receipt_data" not in st.session_state:
+    st.session_state.receipt_data = None
+
+
 with tab1:
     st.subheader("Place Order")
+    if st.session_state.show_receipt:
+        col1, col2 = st.columns([5, 4])
+    else:
+        col1, = st.columns([10])
     with st.container(border = True):
+        with col1:
+            with st.container(border = True):
+                st.markdown("#### **Order Details**")
+                customer_name = st.text_input("Enter item name:", placeholder = "Ex: John Doe")
 
-        col1, col2 = st.columns([5,4])
-        # col1, col2 = st.columns(2) this will give you 50/50 
-        # col1, col2, col3 = st.columns([1,6,1]) # changes spacing 
-
-    with col1:
-        with st.container(border = True):
-            st.markdown("##### Order Details")
-            customer_name = st.text_input("Enter item name:", placeholder = "Ex: John Doe")
-
-            selected_item = st.selectbox("Select Item:", options = inventory,
+                selected_item = st.selectbox("Select Item:", options = inventory,
                                            format_func = lambda x: f"{x['name']}")
             if selected_item:
                 with st.expander("Order Details", expanded = True):
@@ -92,6 +98,7 @@ with tab1:
                     st.stop()
 
                 else:
+                    receipt_col = True
                     with st.spinner("Order is being placed..."):
                         time.sleep(5)
             
@@ -121,19 +128,32 @@ with tab1:
                     # record into json file 
                     with json_file2.open("w", encoding = "utf-8") as f:
                         json.dump(orders, f, indent = 6)
+                    st.session_state.show_receipt = True
+                    st.session_state.receipt_data = {
+                         "order_id" : new_order_id,
+                         "customer" : customer_name,
+                         "item" : selected_item["name"],
+                         "quantity" : quantity_ordered,
+                         "total" : round(total_price, 2),
+                         "status" : order_status
+                    }
+                    st.rerun()
 
 
-
-                    st.success("Order was placed")
-                    with col2: 
-                        with st.container(border = True):
-                            st.markdown("##### Reciept")
-                            st.markdown(f"**Order_ID:** {new_order_id}")
-                            st.markdown(f"**Customer Name:** {customer_name}")
-                            st.markdown(f"**Item Name:** {selected_item['name']}")
-                            st.markdown(f"**Quantity Ordered:** {quantity_ordered}")
-                            st.markdown(f"**Total:** ${total_price:.2f}")
-                            st.markdown(f"**Status:** {order_status}")
+                    
+        if st.session_state.show_receipt and st.session_state.receipt_data:
+            with col2:
+                with st.container(border=True):
+                    receipt = st.session_state.receipt_data
+                    st.markdown("#### **Order Receipt**")
+                    with st.container(border=True):
+                        st.markdown(f"**Order_ID:** {receipt['order_id']}")
+                        st.markdown(f"**Customer Name:** {receipt['customer']}")
+                        st.markdown(f"**Item Name:** {receipt['item']}")
+                        st.markdown(f"**Quantity Ordered:** {receipt['quantity']}")
+                        st.markdown(f"**Total:** ${receipt['total']:.2f}")
+                        st.markdown(f"**Status:** {receipt['status']}")
+            st.success("Order was placed")
                     
 with tab2:
     
