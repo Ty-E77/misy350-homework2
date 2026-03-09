@@ -7,7 +7,6 @@ json_file1 = Path("inventory.json")
 
 json_file2 = Path("orders.json")
 
-
 next_order_id_number = 0
 
 # For saving after changing information
@@ -51,7 +50,6 @@ if "show_receipt" not in st.session_state:
 
 if "receipt_data" not in st.session_state:
     st.session_state.receipt_data = None
-
 
 with tab1:
     st.subheader("Place Order")
@@ -98,7 +96,6 @@ with tab1:
                     st.stop()
 
                 else:
-                    receipt_col = True
                     with st.spinner("Order is being placed..."):
                         time.sleep(5)
             
@@ -108,8 +105,7 @@ with tab1:
                             json.dump(inventory, f, indent=4)
                         
                         next_order_id_number = next_order_id_number + 1
-                        new_order_id = "Order_" + str(next_order_id_number)
-                        
+                        new_order_id = "Order_" + str(next_order_id_number) 
                     
                     order_status = "Placed"
 
@@ -128,6 +124,7 @@ with tab1:
                     # record into json file 
                     with json_file2.open("w", encoding = "utf-8") as f:
                         json.dump(orders, f, indent = 6)
+                    
                     st.session_state.show_receipt = True
                     st.session_state.receipt_data = {
                          "order_id" : new_order_id,
@@ -138,8 +135,6 @@ with tab1:
                          "status" : order_status
                     }
                     st.rerun()
-
-
                     
         if st.session_state.show_receipt and st.session_state.receipt_data:
             with col2:
