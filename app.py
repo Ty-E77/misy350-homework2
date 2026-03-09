@@ -391,7 +391,7 @@ def show_main_app():
                     st.success("Order Cancelled and Stock Refunded")    
 
 
-# -- Runs the main app and login page based in the session state --
+# -- Shows the main app and login page based in the session state --
 if st.session_state["logged_in"]:
     show_main_app()
 else:
