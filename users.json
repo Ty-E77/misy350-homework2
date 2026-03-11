@@ -1,3 +1,9 @@
 [
-
+    {
+        "id": "2f2be615-cc23-46db-b107-de9a35c96276",
+        "email": "tyshawn@udel.edu",
+        "password": "codingisfun",
+        "role": "Inventory Manager",
+        "registered_at": "2026-03-11 11:34:09.808678"
+    }
 ]

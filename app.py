@@ -41,23 +41,6 @@ if json_file3.exists():
     with open(json_file3, "r") as f:
         users = json.load(f)
 
-# -- Initailizing order id variable --
-next_order_id_number = 0
-
-# -- Counting how many orders are in the orders file -- 
-    # got lines 54 from 61 from chatgpt becuase I tried the method we 
-    # we used in class but it would't update
-max_order_num = 0
-for o in orders:
-    oid = str(o.get("order_id", ""))
-    if oid.startswith("Order_"):
-        try:
-            max_order_num = max(max_order_num, int(oid.split("_")[1]))
-        except ValueError:
-            pass
-
-next_order_id_number = max_order_num 
-
 # -- Session state defaults -- 
 if "logged_in" not in st.session_state:
     st.session_state["logged_in"] = False
@@ -212,7 +195,7 @@ def show_main_app():
                             with json_file1.open("w", encoding="utf-8") as f:
                                 json.dump(inventory, f, indent=4)
                             
-                            new_order_id = new_order_id = "Order_" + str(next_order_id_number + 1)
+                            new_order_id = str(uuid.uuid4())
                         
                         order_status = "Placed"
 
