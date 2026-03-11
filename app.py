@@ -6,9 +6,6 @@ import uuid
 from pathlib import Path
 from datetime import datetime
 
-# -- Initailizing order id variable --
-next_order_id_number = 0
-
 # -- Setting page configuration --
 st.set_page_config(page_title = "Inventory Management", 
                    page_icon = "",
@@ -95,8 +92,7 @@ def show_login_page():
             with st.spinner("Creating account..."):
                 time.sleep(1)
                 
-
-                # check for duplicate email
+                # -- Checking for duplicate email and making sure an account doesn't exist --
                 new_email = new_email.strip().lower()
                 existing_user = None
                 for user in users:
@@ -109,6 +105,8 @@ def show_login_page():
                 elif not new_email or not new_password:
                     st.error("Email and password are required.")
                 else:
+
+                    # -- Record into users json file -- 
                     users.append(
                         {
                         "id": str(uuid.uuid4()),
@@ -141,7 +139,7 @@ def show_main_app():
     # -- Establishing each tab
     tab1, tab2, tab3, tab4 = st.tabs(["Place Order", "View Inventory", "Restock", "Manage Orders"])
     
-    # -- Place order tab where users can place an order and see a receipt after -- 
+    # -- Users can place an order and see a receipt after -- 
     with tab1:
         st.subheader("Place Order")
         if st.session_state.show_receipt:
@@ -190,7 +188,7 @@ def show_main_app():
                         with st.spinner("Order is being placed..."):
                             time.sleep(5)
                 
-                        # Reduce stock
+                        # -- Reduce stock in inventory -- 
                             found_item['stock'] -= quantity_ordered
                             with json_file1.open("w", encoding="utf-8") as f:
                                 json.dump(inventory, f, indent=4)
@@ -199,6 +197,7 @@ def show_main_app():
                         
                         order_status = "Placed"
 
+                        # -- Record into orders json file --
                         orders.append(
                             {
                                 "order_id" : new_order_id,
@@ -211,10 +210,10 @@ def show_main_app():
                             }
                         )
 
-                        # record into json file 
                         with json_file2.open("w", encoding = "utf-8") as f:
                             json.dump(orders, f, indent = 6)
                         
+                        # -- Displays receipt -- 
                         st.session_state.show_receipt = True
                         st.session_state.receipt_data = {
                             "order_id" : new_order_id,
@@ -225,7 +224,8 @@ def show_main_app():
                             "status" : order_status
                         }
                         st.rerun()
-                        
+
+            # -- Displaying the recepipt to the user --           
             if st.session_state.show_receipt and st.session_state.receipt_data:
                 with col2:
                     with st.container(border=True):
@@ -248,6 +248,8 @@ def show_main_app():
         st.divider()
 
         with st.container(border = True):
+            
+            # -- View Inventory --
             if tab_option == "View":
                 st.markdown("## **Inventory View**")
                 st.dataframe(inventory)
@@ -255,15 +257,17 @@ def show_main_app():
                 total_stock = 0
                 low_stock = 10
 
+                # -- Shows items with low stock and displays warning -- 
                 for item in inventory:
                     total_stock += item["stock"]
                     if item["stock"] < low_stock:
                         st.warning(f"LOW STOCK: {item['name']} has {item['stock']} left in stock.")
-
+                
+                # -- Shows total stock of all items together --
                 with st.container(border = True):
                     st.markdown(f"### **Total Stock:** {total_stock}")        
-                
 
+            # -- Search Inventory -- 
             else:
                 with st.container(border = True):
                     st.markdown("## Inventory Search")
@@ -317,6 +321,8 @@ def show_main_app():
         
         st.divider()
         with st.container(border = True):
+
+            # -- View Orders --
             if tab_option == "View":
                 st.markdown("## **Order View**")
                 if not orders:
@@ -324,6 +330,8 @@ def show_main_app():
                     st.stop()
                 else:
                     st.dataframe(orders)
+
+            # -- Delete or Cancel Orders --
             else:
                 with st.container(border = True):
                     st.markdown("### Cancel Order")
@@ -353,28 +361,25 @@ def show_main_app():
                         if item['name'] == selected_item['item']:
                             found_item = item
                             break
-
                 
+                    # -- Adding the items back to the inventory -- 
                     found_item['stock'] = selected_item['quantity'] + found_item['stock']
                     with json_file1.open("w", encoding="utf-8") as f:
                         json.dump(inventory, f, indent=4)
-                            
-                    cancel_order = selected_item['order_id']
+
+                    # -- Deleting the order --  
                     orders.remove(selected_item)    
 
                     with st.spinner("Order is being cancelled..."):
                         time.sleep(5)
     
-                        # record into json file 
+                        # -- Record into json file --
                     with json_file2.open("w", encoding = "utf-8") as f:
                         json.dump(orders, f, indent = 6)
 
-
-
                     st.success("Order Cancelled and Stock Refunded")    
 
-
-# -- Shows the main app and login page based in the session state --
+# -- Shows the main app and login page based on the session state --
 if st.session_state["logged_in"]:
     show_main_app()
 else:
